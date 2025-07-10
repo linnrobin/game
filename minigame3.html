@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slot Menang Vegas Style v3.5 - Publicly Hosted Sounds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Basic Reset & Core Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden; 
+      background-color: #1e1e1e;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start; 
+      position: relative; 
+    }
+
+    h1 {
+      text-align: center;
+      color: #f39c12;
+      text-shadow: 0 0 8px #f39c12;
+      font-size: clamp(20px, 5.5vw, 60px); 
+      margin: 8px 0 5px; 
+    }
+
+    .main-wrapper {
+      max-width: 1000px; 
+      width: 100%;
+      padding: 0 5px; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 5px; 
+      flex-grow: 1; 
+      overflow-y: auto; 
+      -webkit-overflow-scrolling: touch; 
+      padding-bottom: 5px; 
+    }
+
+    .slot-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%; 
+      flex-shrink: 0; 
+    }
+
+    /* Slot Machine Layout */
+    .machine {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); 
+      gap: 3px; 
+      margin-top: 5px;
+      width: 100%; 
+      justify-content: center; 
+      max-width: 400px; 
+    }
+
+    .reel-container {
+      width: clamp(45px, 16vw, 70px); 
+      height: clamp(135px, 48vw, 210px); 
+      overflow: hidden;
+      border: 3px solid #f39c12; 
+      border-radius: 8px; 
+      background: #111;
+      box-shadow: inset 0 0 8px #f39c12; 
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .reel {
+      display: flex;
+      flex-direction: column;
+      transition: transform 3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    .symbol {
+      font-size: clamp(28px, 9vw, 45px); 
+      height: clamp(45px, 16vw, 70px); 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 0 3px #f39c12; 
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .symbol .emoji {
+      display: inline-block;
+      line-height: 1;
+      transform: translateY(-10%);
+    }
+
+    /* Buttons */
+    .button-container {
+        position: relative; 
+        width: 85%; 
+        max-width: 280px; 
+        margin-top: 5px; 
+        min-height: calc(clamp(8px, 2.5vw, 12px) + clamp(15px, 7vw, 25px));
+    }
+
+    button {
+      padding: clamp(8px, 2.5vw, 12px) clamp(15px, 7vw, 25px); 
+      font-size: clamp(14px, 3.5vw, 20px); 
+      background-color: #f39c12;
+      border: none;
+      border-radius: 8px; 
+      cursor: pointer;
+      color: black;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(243, 156, 18, 0.6); 
+      transition: background-color 0.3s, transform 0.1s;
+      user-select: none;
+      width: 100%; 
+      position: absolute; 
+      top: 0;
+      left: 0;
+    }
+    
+    button:active:not(:disabled) {
+        transform: translateY(1px); 
+        box-shadow: 0 2px 8px rgba(243, 156, 18, 0.6);
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #d17f0c;
+    }
+
+    button:disabled {
+      background-color: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    /* Neon buzzing effect for winning elements */
+    .neon-buzz {
+        animation: neonBuzz 1.5s infinite alternate;
+        text-shadow: 0 0 3px #fff, 0 0 6px #f39c12, 0 0 9px #f39c12, 0 0 12px #f39c12; 
+    }
+
+    @keyframes neonBuzz {
+        0%, 100% {
+            box-shadow: 0 0 8px #f39c12, 0 0 16px #f39c12; 
+        }
+        50% {
+            box-shadow: 0 0 4px #fff, 0 0 12px #f39c12, 0 0 20px #f39c12;
+        }
+    }
+
+    #result {
+      margin-top: 5px; 
+      font-size: clamp(14px, 3.5vw, 20px); 
+      font-weight: bold;
+      color: #2ecc71;
+      text-shadow: 0 0 4px #2ecc71; 
+      min-height: 25px; 
+      user-select: none;
+    }
+
+    /* Leaderboard */
+    .leaderboard {
+      margin-top: 10px; 
+      background: #222;
+      border: 2px solid #f39c12; 
+      border-radius: 10px; 
+      padding: 10px; 
+      box-shadow: 0 0 12px #f39c12; 
+      color: #f39c12;
+      font-weight: 700;
+      font-size: clamp(12px, 3vw, 16px); 
+      user-select: none;
+      width: 95%; 
+      max-width: 500px; 
+      flex-shrink: 1; 
+      flex-basis: auto; 
+    }
+
+    .leaderboard h2 {
+      margin-top: 0;
+      margin-bottom: 6px; 
+      text-align: center;
+      font-size: clamp(18px, 4.5vw, 24px); 
+      color: #fff;
+      text-shadow: 0 0 8px #f39c12;
+    }
+
+    .bonus-item {
+      margin-bottom: 6px; 
+      padding: 6px 10px; 
+      background: #333;
+      border-radius: 8px; 
+    }
+
+    /* Confetti (unchanged) */
+    .confetti {
+      position: fixed;
+      font-size: 32px;
+      pointer-events: none;
+      z-index: 10000;
+      animation: explode 1s ease-out forwards;
+      user-select: none;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(0) translate(0, 0); opacity: 1; }
+      100% { transform: scale(1.5) translate(var(--x), var(--y)); opacity: 0; }
+    }
+
+    /* Media Queries for Desktop Adjustments (Mobile-first approach) */
+    @media (min-width: 768px) {
+      body {
+        justify-content: center; 
+        overflow: hidden; 
+      }
+
+      .main-wrapper {
+        flex-direction: row; 
+        align-items: flex-start; 
+        justify-content: center;
+        flex-grow: 0; 
+        max-width: 1200px; 
+        height: auto; 
+        gap: 20px; 
+        overflow-y: hidden; 
+        padding-bottom: 0; 
+      }
+
+      h1 {
+        font-size: 60px; 
+        margin: 10px 0 5px;
+      }
+
+      .slot-area {
+        width: auto; 
+      }
+
+      .machine {
+        gap: 10px; 
+        margin-top: 10px; 
+        max-width: none; 
+      }
+
+      .reel-container {
+        width: 80px; 
+        height: 240px; 
+        border: 4px solid #f39c12; 
+        border-radius: 12px; 
+        box-shadow: inset 0 0 12px #f39c12; 
+      }
+
+      .symbol {
+        font-size: 50px; 
+        height: 80px; 
+        text-shadow: 0 0 4px #f39c12; 
+      }
+
+      .button-container {
+        margin-top: 10px; 
+      }
+
+      button {
+        padding: 14px 30px; 
+        font-size: 20px; 
+        border-radius: 12px; 
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.8); 
+      }
+      button:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 3px 10px rgba(243, 156, 18, 0.8);
+      }
+
+
+      .neon-buzz {
+        text-shadow: 0 0 5px #fff, 0 0 10px #f39c12, 0 0 15px #f39c12, 0 0 20px #f39c12, 0 0 25px #f39c12, 0 0 30px #f39c12;
+      }
+
+      @keyframes neonBuzz {
+          0%, 100% {
+              box-shadow: 0 0 10px #f39c12, 0 0 20px #f39c12, 0 0 30px #f39c12;
+          }
+          50% {
+              box-shadow: 0 0 5px #fff, 0 0 15px #f39c12, 0 0 25px #f39c12, 0 0 35px #f39c12;
+          }
+      }
+
+      #result {
+        min-height: 30px; 
+        font-size: 22px; 
+        text-shadow: 0 0 6px #2ecc71;
+      }
+
+      .leaderboard {
+        width: 400px; 
+        margin-top: 0; 
+        padding: 15px; 
+        border: 3px solid #f39c12; 
+        border-radius: 15px; 
+        box-shadow: 0 0 18px #f39c12; 
+        font-size: 18px; 
+      }
+
+      .leaderboard h2 {
+        margin-bottom: 10px; 
+        font-size: 26px; 
+        text-shadow: 0 0 10px #f39c12;
+      }
+
+      .bonus-item {
+        margin-bottom: 10px; 
+        padding: 10px 15px; 
+        border-radius: 12px; 
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎰 Slot Menang Vegas Style v3.5</h1>
+
+<div class="main-wrapper">
+  <div class="slot-area">
+    <div class="machine" id="machine"></div>
+    <div class="button-container">
+        <button id="actionButton">🕹️ Mulai Spin</button>
+        <button id="claimRewardButton" style="display: none;">💰 Claim Reward</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <div class="leaderboard">
+    <h2>Bonus Leaderboard</h2>
+    </div>
+</div>
+
+<script>
+  // Game Configuration Object
+  const gameConfig = {
+    // Reel Data
+    reelEmojis: ["💎", "🍀", "🎉", "🪙", "🎁", "🦄"],
+    reelRows: 3,
+    reelCols: 5,
+    animationSymbolsCount: 10,
+
+    // Win Conditions & Bonuses
+    guaranteedWinSpins: [1, 2, 3], 
+    winningMatchCount: 10, 
+    bonusRewards: {
+      1: { percentage: 100, text: "Bonus 100% deposit" },
+      2: { percentage: 75, text: "Bonus 75% deposit" },
+      3: { percentage: 50, text: "Bonus 50% deposit" },
+      4: { percentage: 25, text: "Bonus 25% deposit" },
+      5: { percentage: 10, text: "Bonus 10% deposit" }
+    },
+    defaultLossText: "Better luck next time!",
+
+    // UI Texts & Messages
+    buttonTexts: {
+      spin: "🕹️ Mulai Spin",
+      claim: "💰 Claim Reward"
+    },
+    resultMessages: {
+      spinning: "Spinning...",
+      win: (bonus, count, symbol) => `🎉 YOU WIN! Bonus ${bonus}%! (${count}x ${symbol})`,
+      lose: "💨 So close! Try again!"
+    },
+    claimRewardURL: "https://www.google.com", 
+
+    // Sounds - Publicly hosted via cdnjs.com (from the howler.js library examples)
+    // These are reliable public URLs.
+    sounds: {
+      buttonClick: "https://cdnjs.cloudflare.com/ajax/libs/howler.js/2.2.3/examples/audio/click.mp3",
+      spinStart: "https://cdnjs.cloudflare.com/ajax/libs/howler.js/2.2.3/examples/audio/spin.mp3",
+      spinEndWin: "https://cdnjs.cloudflare.com/ajax/libs/howler.js/2.2.3/examples/audio/chime.mp3",
+      spinEndLose: "https://cdnjs.cloudflare.com/ajax/libs/howler.js/2.2.3/examples/audio/ding.mp3"
+    },
+
+    // Images (Placeholders)
+    images: {
+      background: "slot_bg.jpg",
+      logo: "slot_logo.png"
+    }
+  };
+
+  // UI Module
+  const UI = (function(config) {
+    const elements = {
+      actionButton: document.getElementById('actionButton'),
+      claimRewardButton: document.getElementById('claimRewardButton'),
+      resultDisplay: document.getElementById('result'),
+      machine: document.getElementById('machine'),
+      leaderboard: document.querySelector(".leaderboard"),
+      bonusItems: null,
+      audioPlayers: {} // Store Audio objects for sounds
+    };
+
+    // Pre-load audio elements
+    function initializeAudio() {
+        for (const key in config.sounds) {
+            if (config.sounds.hasOwnProperty(key)) {
+                elements.audioPlayers[key] = new Audio(config.sounds[key]);
+                // Optionally pre-load if needed, but only after user interaction for policy compliance
+                elements.audioPlayers[key].load(); 
+            }
+        }
+    }
+
+    function playSound(soundKey) {
+        const audio = elements.audioPlayers[soundKey];
+        if (audio) {
+            // Reset and play to allow rapid consecutive sounds (like clicks)
+            audio.currentTime = 0; 
+            audio.play().catch(e => console.warn(`Audio playback failed for ${soundKey}:`, e));
+        } else {
+            console.warn(`Sound "${soundKey}" not found or initialized.`);
+        }
+    }
+
+    function renderReelStructure() {
+      elements.machine.innerHTML = '';
+      for (let i = 0; i < config.reelCols; i++) {
+        const container = document.createElement('div');
+        container.className = 'reel-container';
+        const reel = document.createElement('div');
+        reel.className = 'reel';
+        reel.id = `reel${i}`;
+        container.appendChild(reel);
+        elements.machine.appendChild(container);
+      }
+    }
+
+    function renderReelSymbols(reelId, symbolsArray) {
+      const reel = document.getElementById(reelId);
+      reel.innerHTML = "";
+      reel.style.transition = 'none';
+      reel.style.transform = 'translateY(0)';
+      symbolsArray.forEach(sym => {
+        const div = document.createElement("div");
+        div.className = "symbol";
+        div.innerHTML = `<span class="emoji">${sym}</span>`;
+        reel.appendChild(div);
+      });
+    }
+
+    function animateReels() {
+      const firstSymbol = document.querySelector('.symbol');
+      if (!firstSymbol) {
+          console.error("No .symbol element found to calculate height for animation.");
+          return Promise.resolve(); 
+      }
+      const symbolHeight = firstSymbol.offsetHeight;
+
+      if (symbolHeight === 0) {
+          console.warn("Symbol height is 0, animation will not occur. Check CSS or rendering.");
+          return Promise.resolve();
+      }
+      
+      const offset = symbolHeight * config.animationSymbolsCount;
+
+      return new Promise(resolve => {
+        let completedAnimations = 0;
+        for (let i = 0; i < config.reelCols; i++) {
+          const reel = document.getElementById(`reel${i}`);
+          if (reel) { 
+            reel.style.transition = 'transform 2.5s cubic-bezier(0.22, 0.61, 0.36, 1)';
+            reel.style.transform = `translateY(-${offset}px)`;
+
+            setTimeout(() => {
+              completedAnimations++;
+              if (completedAnimations === config.reelCols) {
+                resolve();
+              }
+            }, 2500); 
+          } else {
+            console.warn(`Reel element with ID reel${i} not found.`);
+            completedAnimations++; 
+            if (completedAnimations === config.reelCols) {
+              resolve();
+            }
+          }
+        }
+      });
+    }
+
+    function updateResult(message, isWinning = false) {
+      elements.resultDisplay.textContent = message;
+      if (isWinning) {
+        elements.resultDisplay.style.color = '#2ecc71';
+        elements.resultDisplay.style.textShadow = '0 0 6px #2ecc71';
+      } else {
+        elements.resultDisplay.style.color = '#fff';
+        elements.resultDisplay.style.textShadow = 'none';
+      }
+    }
+
+    function showSpinButton() {
+      elements.actionButton.style.display = 'block';
+      elements.claimRewardButton.style.display = 'none';
+      elements.actionButton.disabled = false;
+      elements.actionButton.textContent = config.buttonTexts.spin;
+      elements.claimRewardButton.classList.remove('neon-buzz');
+    }
+
+    function showClaimButton(addNeonEffect = false) {
+      elements.actionButton.style.display = 'none';
+      elements.claimRewardButton.style.display = 'block';
+      elements.claimRewardButton.disabled = false;
+      elements.claimRewardButton.textContent = config.buttonTexts.claim;
+      if (addNeonEffect) {
+        elements.claimRewardButton.classList.add('neon-buzz');
+      } else {
+        elements.claimRewardButton.classList.remove('neon-buzz');
+      }
+    }
+
+    function disableSpinButton() {
+        elements.actionButton.disabled = true;
+    }
+
+    function renderLeaderboard() {
+        let leaderboardContent = `<h2>Bonus Leaderboard</h2>`;
+        for (const spinNum in config.bonusRewards) {
+            const reward = config.bonusRewards[spinNum];
+            leaderboardContent += `
+                <div class="bonus-item" data-spin="${spinNum}">
+                    ${spinNum}th Spin: ≥ ${config.winningMatchCount} same emoji → ${reward.text}
+                </div>
+            `;
+        }
+        leaderboardContent += `
+            <div class="bonus-item" data-spin="0">
+                ${config.defaultLossText}
+            </div>
+        `;
+        elements.leaderboard.innerHTML = leaderboardContent;
+        elements.bonusItems = [...document.querySelectorAll(".bonus-item")];
+    }
+
+    function highlightBonus(currentSpin, isWinningSpin = false) {
+      elements.bonusItems.forEach(item => {
+        item.style.backgroundColor = '#333';
+        item.style.color = '';
+        item.classList.remove('neon-buzz');
+
+        const dataSpin = parseInt(item.dataset.spin);
+        if (currentSpin > 0 && dataSpin === currentSpin) {
+          item.style.backgroundColor = '#f39c12';
+          item.style.color = '#000';
+          if (isWinningSpin) {
+            item.classList.add('neon-buzz');
+          }
+        } else if (currentSpin === 0 && dataSpin === 0) {
+          item.style.backgroundColor = '#f39c12';
+          item.style.color = '#000';
+        }
+      });
+    }
+
+    function bindSpinButton(handler) {
+      elements.actionButton.onclick = () => {
+        playSound('buttonClick');
+        handler();
+      };
+    }
+
+    function bindClaimButton(handler) {
+      elements.claimRewardButton.onclick = () => {
+        playSound('buttonClick');
+        handler();
+      };
+    }
+
+    // Return the public interface of the UI module
+    return {
+      elements,
+      renderReelStructure,
+      renderReelSymbols,
+      animateReels,
+      updateResult,
+      showSpinButton,
+      showClaimButton,
+      disableSpinButton,
+      renderLeaderboard,
+      highlightBonus,
+      bindSpinButton,
+      bindClaimButton,
+      playSound,
+      initializeAudio 
+    };
+  })(gameConfig);
+
+  // SlotMachine Core Logic
+  const SlotMachine = (function(ui, config) {
+    let spinCount = 0;
+    let guaranteedWinSpin = 0; 
+    let selectedWinningSymbol = null; 
+
+    function getRandomSymbol() {
+      return config.reelEmojis[Math.floor(Math.random() * config.reelEmojis.length)];
+    }
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function countMatchingSymbols() {
+      const allSymbols = [];
+      for (let i = 0; i < config.reelCols; i++) {
+        const reel = document.getElementById(`reel${i}`);
+        if (!reel) { 
+            console.warn(`Reel with ID reel${i} not found when counting symbols.`);
+            continue;
+        }
+        const symbolsInReel = Array.from(reel.querySelectorAll('.symbol')).map(s => s.textContent);
+        const visibleSymbols = symbolsInReel.slice(-config.reelRows);
+        allSymbols.push(...visibleSymbols);
+      }
+      const counts = {};
+      allSymbols.forEach(s => counts[s] = (counts[s] || 0) + 1);
+      return counts;
+    }
+
+    function generateReelSymbols(isWinningSpin, reelIndex) {
+      const reelSymbols = [];
+      for (let i = 0; i < config.animationSymbolsCount; i++) {
+        reelSymbols.push(getRandomSymbol());
+      }
+
+      if (isWinningSpin) {
+        if (!selectedWinningSymbol) {
+             selectedWinningSymbol = getRandomSymbol(); 
+        }
+
+        const visibleSymbolsForThisReel = [];
+        let winningSymbolsPlacedOnReel = 0;
+        
+        let targetWinningSymbolsForReel = 0;
+        if (reelIndex === 0 || reelIndex === 1) { 
+            targetWinningSymbolsForReel = 3;
+        } else if (reelIndex === 2 || reelIndex === 3) { 
+            targetWinningSymbolsForReel = 2;
+        } else { 
+            targetWinningSymbolsForReel = getRandomInt(1, 3); 
+        }
+        
+        for (let i = 0; i < config.reelRows; i++) {
+            if (winningSymbolsPlacedOnReel < targetWinningSymbolsForReel) {
+                visibleSymbolsForThisReel.push(selectedWinningSymbol);
+                winningSymbolsPlacedOnReel++;
+            } else {
+                visibleSymbolsForThisReel.push(getRandomSymbol());
+            }
+        }
+
+        for (let i = visibleSymbolsForThisReel.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [visibleSymbolsForThisReel[i], visibleSymbolsForThisReel[j]] = [visibleSymbolsForThisReel[j], visibleSymbolsForThisReel[i]];
+        }
+        
+        reelSymbols.push(...visibleSymbolsForThisReel);
+
+      } else {
+        selectedWinningSymbol = null; 
+        for (let i = 0; i < config.reelRows; i++) {
+          reelSymbols.push(getRandomSymbol());
+        }
+      }
+      return reelSymbols;
+    }
+
+    async function startSpin() {
+      ui.playSound('spinStart');
+      ui.disableSpinButton(); 
+      ui.updateResult(config.resultMessages.spinning);
+      spinCount++;
+      ui.highlightBonus(spinCount, false);
+
+      if (!config.bonusRewards[spinCount]) {
+        ui.highlightBonus(0, false);
+      }
+
+      if (ui.elements.machine.innerHTML === '') {
+        ui.renderReelStructure();
+        for (let i = 0; i < config.reelCols; i++) {
+            const initialSymbols = [];
+            for (let j = 0; j < config.reelRows; j++) {
+                initialSymbols.push(getRandomSymbol());
+            }
+            ui.renderReelSymbols(`reel${i}`, initialSymbols);
+        }
+      }
+      
+      const isCurrentSpinGuaranteedWin = (spinCount === guaranteedWinSpin);
+      
+      for (let i = 0; i < config.reelCols; i++) {
+        const reelSymbols = generateReelSymbols(isCurrentSpinGuaranteedWin, i);
+        ui.renderReelSymbols(`reel${i}`, reelSymbols); 
+      }
+      
+      await ui.animateReels();
+
+      const counts = countMatchingSymbols();
+      const mostFrequentSymbol = Object.keys(counts).length > 0 ? Object.keys(counts).reduce((a, b) => (counts[a] > counts[b] ? a : b)) : null;
+      const maxMatch = mostFrequentSymbol ? counts[mostFrequentSymbol] : 0;
+      
+      let won = false;
+
+      if (maxMatch >= config.winningMatchCount && config.bonusRewards[spinCount]) {
+        won = true;
+        const bonus = config.bonusRewards[spinCount].percentage;
+        ui.updateResult(config.resultMessages.win(bonus, maxMatch, mostFrequentSymbol), true);
+        ui.showClaimButton(true);
+        ui.highlightBonus(spinCount, true);
+        ui.bindClaimButton(() => window.location.href = config.claimRewardURL);
+        ui.playSound('spinEndWin');
+        selectedWinningSymbol = null; 
+      } else {
+        ui.updateResult(config.resultMessages.lose);
+        ui.highlightBonus(0, false);
+        ui.showSpinButton(); 
+        ui.playSound('spinEndLose');
+        selectedWinningSymbol = null;
+      }
+    }
+
+    function init() {
+      spinCount = 0;
+      guaranteedWinSpin = config.guaranteedWinSpins[Math.floor(Math.random() * config.guaranteedWinSpins.length)];
+      selectedWinningSymbol = null;
+
+      ui.initializeAudio(); // Initialize audio players on init
+      ui.renderLeaderboard();
+      ui.renderReelStructure(); 
+      for (let i = 0; i < config.reelCols; i++) {
+        const initialSymbols = [];
+        for (let j = 0; j < config.reelRows; j++) {
+            initialSymbols.push(getRandomSymbol());
+        }
+        ui.renderReelSymbols(`reel${i}`, initialSymbols);
+      }
+      ui.highlightBonus(0, false);
+      ui.showSpinButton();
+      ui.bindSpinButton(startSpin);
+    }
+
+    return {
+      init
+    };
+  })(UI, gameConfig);
+
+  // Initialize the game when the window loads
+  window.onload = SlotMachine.init;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slot Menang Vegas Style v0.6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e1e1e;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      overflow: hidden;
+    }
+    h1 {
+      color: #f39c12;
+      text-shadow: 0 0 8px #f39c12;
+      font-size: 6vw;
+    }
+    .machine {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .reel-container {
+      width: 80px;
+      height: 80px;
+      overflow: hidden;
+      border: 4px solid #f39c12;
+      border-radius: 12px;
+      background: #111;
+      box-shadow: inset 0 0 12px #f39c12;
+    }
+    .reel {
+      display: flex;
+      flex-direction: column;
+      transition: transform 3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .symbol {
+      font-size: 50px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 0 4px #f39c12;
+    }
+    button {
+      margin-top: 30px;
+      padding: 14px 30px;
+      font-size: 18px;
+      background-color: #f39c12;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: black;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(243, 156, 18, 0.8);
+      transition: background-color 0.3s;
+    }
+    button:hover:not(:disabled) {
+      background-color: #d17f0c;
+    }
+    button:disabled {
+      background-color: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #2ecc71;
+      text-shadow: 0 0 6px #2ecc71;
+      min-height: 30px;
+    }
+    .confetti {
+      position: fixed;
+      font-size: 30px;
+      pointer-events: none;
+      z-index: 999;
+      animation: explode 1s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(0) translate(0, 0); opacity: 1; }
+      100% { transform: scale(1.5) translate(var(--x), var(--y)); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎰 Slot Menang Vegas Style</h1>
+<p>Klik tombol untuk memutar dan menangkan hadiah!</p>
+
+<div class="machine">
+  <div class="reel-container"><div class="reel" id="reel1"></div></div>
+  <div class="reel-container"><div class="reel" id="reel2"></div></div>
+  <div class="reel-container"><div class="reel" id="reel3"></div></div>
+</div>
+
+<button id="actionButton" onclick="startSpin()">🕹️ Mulai Spin</button>
+
+<div id="result"></div>
+
+<!-- Audio -->
+<audio id="sound-click" preload="auto" src="sounds/click.mp3"></audio>
+<audio id="sound-spin" loop preload="auto" src="sounds/spin.mp3"></audio>
+<audio id="sound-win" preload="auto" src="sounds/jackpot.mp3"></audio>
+
+<script>
+  const symbols = ["💎", "🍀", "🎉", "🪙", "🎁", "🦄"];
+  let spinCount = 0;
+  let winAfter = Math.floor(Math.random() * 3) + 1;
+  let hasWon = false;
+
+  const soundClick = document.getElementById('sound-click');
+  const soundSpin = document.getElementById('sound-spin');
+  const soundWin = document.getElementById('sound-win');
+  const button = document.getElementById("actionButton");
+  const result = document.getElementById("result");
+
+  function buildReel(finalSymbol, forceWin) {
+    const reelSymbols = [];
+    for (let i = 0; i < 19; i++) {
+      const sym = symbols[Math.floor(Math.random() * symbols.length)];
+      reelSymbols.push(sym);
+    }
+    reelSymbols.push(forceWin ? finalSymbol : symbols[Math.floor(Math.random() * symbols.length)]);
+    return reelSymbols;
+  }
+
+  function renderReel(reelId, symbolsArray) {
+    const reel = document.getElementById(reelId);
+    reel.innerHTML = "";
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+    symbolsArray.forEach(sym => {
+      const div = document.createElement("div");
+      div.className = "symbol";
+      div.textContent = sym;
+      reel.appendChild(div);
+    });
+  }
+
+  function startSpin() {
+    soundClick.currentTime = 0;
+    soundClick.play();
+
+    if (hasWon) {
+      window.location.href = "https://www.google.com";
+      return;
+    }
+
+    spinCount++;
+    button.disabled = true;
+    result.textContent = "";
+
+    const forceWin = spinCount === winAfter;
+    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+
+    renderReel("reel1", buildReel(finalSymbol, forceWin));
+    renderReel("reel2", buildReel(finalSymbol, forceWin));
+    renderReel("reel3", buildReel(finalSymbol, forceWin));
+
+    soundSpin.currentTime = 0;
+    soundSpin.play().catch(console.warn);
+
+    setTimeout(() => {
+      const offset = 80 * 19;
+      ["reel1", "reel2", "reel3"].forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.style.transition = `transform ${3 + i * 0.3}s`;
+        el.style.transform = `translateY(-${offset}px)`;
+      });
+    }, 50);
+
+    setTimeout(() => {
+      soundSpin.pause();
+      if (forceWin) {
+        soundWin.currentTime = 0;
+        soundWin.play();
+        result.textContent = `🎉 JACKPOT! Simbol: ${finalSymbol}`;
+        button.textContent = "🎁 CLAIM REWARD";
+        hasWon = true;
+        launchConfetti();
+      } else {
+        result.textContent = "💨 Coba lagi ya!";
+      }
+      button.disabled = false;
+    }, 3700);
+  }
+
+  function launchConfetti() {
+    const emojis = ["🎉", "🎊", "💥"];
+    for (let i = 0; i < 80; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      confetti.style.left = "50vw";
+      confetti.style.top = "50vh";
+      confetti.style.setProperty('--x', `${(Math.random() - 0.5) * 400}px`);
+      confetti.style.setProperty('--y', `${(Math.random() - 0.5) * 400}px`);
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 1000);
+    }
+  }
+
+  // Initial reel display
+  window.addEventListener("DOMContentLoaded", () => {
+    const defaultSymbol = "💎";
+    renderReel("reel1", Array(20).fill(defaultSymbol));
+    renderReel("reel2", Array(20).fill(defaultSymbol));
+    renderReel("reel3", Array(20).fill(defaultSymbol));
+  });
+</script>
+
+</body>
+</html>

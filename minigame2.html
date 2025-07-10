@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slot Menang Vegas Style v2.1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1e1e1e;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h1 {
+      text-align: center;
+      color: #f39c12;
+      text-shadow: 0 0 8px #f39c12;
+      font-size: clamp(24px, 6vw, 60px);
+      margin: 10px 0 5px;
+    }
+
+    .main-wrapper {
+      max-width: 1000px;
+      width: 100%;
+      padding: 0 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      flex-grow: 1;
+    }
+
+    .slot-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .machine {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .reel-container {
+      width: clamp(50px, 15vw, 80px);
+      height: clamp(50px, 15vw, 80px);
+      overflow: hidden;
+      border: 4px solid #f39c12;
+      border-radius: 12px;
+      background: #111;
+      box-shadow: inset 0 0 12px #f39c12;
+      user-select: none;
+    }
+
+    .reel {
+      display: flex;
+      flex-direction: column;
+      transition: transform 3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    .symbol {
+      font-size: clamp(30px, 7vw, 50px);
+      height: clamp(50px, 15vw, 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 0 4px #f39c12;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+      user-select: none;
+    }
+
+    .symbol .emoji {
+      display: inline-block;
+      line-height: 1;
+      transform: translateY(-10%);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: clamp(10px, 2vw, 14px) clamp(20px, 5vw, 30px);
+      font-size: clamp(14px, 4vw, 20px);
+      background-color: #f39c12;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: black;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(243, 156, 18, 0.8);
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #d17f0c;
+    }
+
+    button:disabled {
+      background-color: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    #result {
+      margin-top: 8px;
+      font-size: clamp(16px, 3vw, 22px);
+      font-weight: bold;
+      color: #2ecc71;
+      text-shadow: 0 0 6px #2ecc71;
+      min-height: 30px;
+      user-select: none;
+    }
+
+    .leaderboard {
+      max-width: 90vw;
+      margin: 0 auto 10px;
+      background: #222;
+      border: 3px solid #f39c12;
+      border-radius: 15px;
+      padding: 15px 5vw;
+      box-shadow: 0 0 18px #f39c12;
+      color: #f39c12;
+      font-weight: 700;
+      font-size: clamp(14px, 3vw, 18px);
+      user-select: none;
+    }
+
+    .leaderboard h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: clamp(20px, 4vw, 26px);
+      color: #fff;
+      text-shadow: 0 0 10px #f39c12;
+    }
+
+    .bonus-item {
+      margin-bottom: 10px;
+      padding: 10px 15px;
+      background: #333;
+      border-radius: 12px;
+      transition: background-color 0.3s, box-shadow 0.6s;
+    }
+
+    .bonus-item.current {
+      background-color: #f39c12;
+      color: black;
+      font-weight: 900;
+      box-shadow: 0 0 12px #f39c12, 0 0 24px #f39c12, 0 0 40px #f39c12;
+      animation: neonShine 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes neonShine {
+      0% {
+        text-shadow: 0 0 6px #f39c12, 0 0 10px #f39c12, 0 0 20px #f39c12;
+        box-shadow: 0 0 10px #f39c12, 0 0 20px #f39c12;
+      }
+      100% {
+        text-shadow: 0 0 12px #ffd24d, 0 0 18px #ffd24d, 0 0 28px #ffd24d;
+        box-shadow: 0 0 15px #ffd24d, 0 0 30px #ffd24d;
+      }
+    }
+
+    .confetti {
+      position: fixed;
+      font-size: 32px;
+      pointer-events: none;
+      z-index: 10000;
+      animation: explode 1s ease-out forwards;
+      user-select: none;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(0) translate(0, 0); opacity: 1; }
+      100% { transform: scale(1.5) translate(var(--x), var(--y)); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎰 Slot Menang Vegas Style v2.1</h1>
+
+<div class="main-wrapper">
+  <div class="slot-area">
+    <div class="machine">
+      <div class="reel-container"><div class="reel" id="reel1"></div></div>
+      <div class="reel-container"><div class="reel" id="reel2"></div></div>
+      <div class="reel-container"><div class="reel" id="reel3"></div></div>
+    </div>
+    <button id="actionButton" onclick="startSpin()">🕹️ Mulai Spin</button>
+    <div id="result"></div>
+  </div>
+</div>
+
+<div class="leaderboard" aria-label="Bonus Leaderboard" role="region">
+  <h2>Bonus Leaderboard</h2>
+  <div id="bonusList">
+    <div class="bonus-item" data-spin="1">1st Spin: Bonus 100% deposit</div>
+    <div class="bonus-item" data-spin="2">2nd Spin: Bonus 75% deposit</div>
+    <div class="bonus-item" data-spin="3">3rd Spin: Bonus 50% deposit</div>
+    <div class="bonus-item" data-spin="4">4th Spin: Bonus 25% deposit</div>
+    <div class="bonus-item" data-spin="5">5th Spin: Bonus 10% deposit</div>
+    <div class="bonus-item" data-spin="0">Better luck next time</div>
+  </div>
+</div>
+
+<!-- Sounds -->
+<audio id="sound-click" preload="auto" src="sounds/click.mp3"></audio>
+<audio id="sound-spin" loop preload="auto" src="sounds/spin.mp3"></audio>
+<audio id="sound-win" preload="auto" src="sounds/jackpot.mp3"></audio>
+
+<script>
+  const symbols = ["💎", "🍀", "🎉", "🪙", "🎁", "🦄"];
+  let spinCount = 0;
+  let winAfter = Math.floor(Math.random() * 3) + 1;
+  let hasWon = false;
+
+  const soundClick = document.getElementById('sound-click');
+  const soundSpin = document.getElementById('sound-spin');
+  const soundWin = document.getElementById('sound-win');
+  const button = document.getElementById("actionButton");
+  const result = document.getElementById("result");
+  const bonusItems = [...document.querySelectorAll(".bonus-item")];
+
+  function buildReel(finalSymbol, forceWin) {
+    const reelSymbols = [];
+    for (let i = 0; i < 19; i++) {
+      reelSymbols.push(symbols[Math.floor(Math.random() * symbols.length)]);
+    }
+    reelSymbols.push(forceWin ? finalSymbol : symbols[Math.floor(Math.random() * symbols.length)]);
+    return reelSymbols;
+  }
+
+  function renderReel(reelId, symbolsArray) {
+    const reel = document.getElementById(reelId);
+    reel.innerHTML = "";
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+    symbolsArray.forEach(sym => {
+      const div = document.createElement("div");
+      div.className = "symbol";
+      div.innerHTML = `<span class="emoji">${sym}</span>`;
+      reel.appendChild(div);
+    });
+  }
+
+  function highlightBonus(spin) {
+    bonusItems.forEach(item => {
+      item.classList.toggle("current", parseInt(item.dataset.spin) === spin);
+    });
+  }
+
+  function startSpin() {
+    soundClick.currentTime = 0;
+    soundClick.play();
+
+    if (hasWon) {
+      window.location.href = "https://www.google.com";
+      return;
+    }
+
+    spinCount++;
+    button.disabled = true;
+    result.textContent = "";
+
+    highlightBonus(spinCount);
+
+    const forceWin = spinCount === winAfter;
+    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+
+    renderReel("reel1", buildReel(finalSymbol, forceWin));
+    renderReel("reel2", buildReel(finalSymbol, forceWin));
+    renderReel("reel3", buildReel(finalSymbol, forceWin));
+
+    soundSpin.currentTime = 0;
+    soundSpin.play().catch(() => {});
+
+    setTimeout(() => {
+      const offset = parseInt(getComputedStyle(document.querySelector('.reel-container')).height) * 19;
+      ["reel1", "reel2", "reel3"].forEach((id, i) => {
+        const el = document.getElementById(id);
+        el.style.transition = `transform ${3 + i * 0.3}s`;
+        el.style.transform = `translateY(-${offset}px)`;
+      });
+    }, 50);
+
+    setTimeout(() => {
+      soundSpin.pause();
+      if (forceWin) {
+        soundWin.currentTime = 0;
+        soundWin.play();
+        result.textContent = `🎉 JACKPOT! Simbol: ${finalSymbol}`;
+        button.textContent = "🎁 CLAIM REWARD";
+        hasWon = true;
+        launchConfetti();
+      } else {
+        result.textContent = "💨 Coba lagi ya!";
+        highlightBonus(0);
+      }
+      button.disabled = false;
+    }, 3700);
+  }
+
+  function launchConfetti() {
+    const emojis = ["🎉", "🎊", "💥"];
+    for (let i = 0; i < 80; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      confetti.style.left = "50vw";
+      confetti.style.top = "50vh";
+      confetti.style.setProperty('--x', `${(Math.random() - 0.5) * 400}px`);
+      confetti.style.setProperty('--y', `${(Math.random() - 0.5) * 400}px`);
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 1200);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const defaultSymbol = "💎";
+    renderReel("reel1", Array(20).fill(defaultSymbol));
+    renderReel("reel2", Array(20).fill(defaultSymbol));
+    renderReel("reel3", Array(20).fill(defaultSymbol));
+    highlightBonus(0);
+  });
+</script>
+
+</body>
+</html>

@@ -2,9 +2,21 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Slot Menang Vegas Style v0.6</title>
+  <title>Slot Menang Vegas Style v0.6 - Mainkan Sekarang dan Menangkan!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
+  <meta name="description" content="Mainkan Slot Menang Vegas Style v0.6 dan rasakan sensasi slot kasino! Putar gulungan dan menangkan jackpot besar dengan simbol-simbol menarik seperti berlian, semanggi, dan banyak lagi." />
+  <meta name="keywords" content="slot online, slot vegas, permainan slot, jackpot, kasino online, game hiburan, main slot, slot gratis, menangkan hadiah, slot Indonesia" />
+  <meta name="author" content="Your Name or Company Name" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.yourwebsite.com/slot-game" /> <meta property="og:title" content="Slot Menang Vegas Style v0.6 - Putar dan Menangkan!" />
+  <meta property="og:description" content="Rasakan keseruan slot Vegas di mana saja! Mainkan Slot Menang Vegas Style v0.6 dan coba keberuntungan Anda untuk meraih jackpot hari ini." />
+  <meta property="og:type" content="game" />
+  <meta property="og:url" content="https://www.yourwebsite.com/slot-game" /> <meta property="og:image" content="https://www.yourwebsite.com/images/slot-thumbnail.jpg" /> <meta property="og:image:alt" content="Tampilan layar permainan Slot Menang Vegas Style" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@yourtwitterhandle" /> <meta name="twitter:creator" content="@yourtwitterhandle" /> <meta name="twitter:title" content="Slot Menang Vegas Style v0.6 - Menangkan Jackpot!" />
+  <meta name="twitter:description" content="Putar gulungan di Slot Menang Vegas Style v0.6 dan raih kemenangan besar. Pengalaman slot kasino yang mendebarkan menanti Anda!" />
+  <meta name="twitter:image" content="https://www.yourwebsite.com/images/slot-thumbnail.jpg" /> <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #1e1e1e;
@@ -101,19 +113,51 @@
   <div class="reel-container"><div class="reel" id="reel3"></div></div>
 </div>
 
-<button id="actionButton" onclick="startSpin()">🕹️ Mulai Spin</button>
+<button id="actionButton"></button>
 
 <div id="result"></div>
 
-<!-- Audio -->
-<audio id="sound-click" preload="auto" src="sounds/click.mp3"></audio>
-<audio id="sound-spin" loop preload="auto" src="sounds/spin.mp3"></audio>
-<audio id="sound-win" preload="auto" src="sounds/jackpot.mp3"></audio>
+<audio id="sound-click" preload="auto"></audio>
+<audio id="sound-spin" loop preload="auto"></audio>
+<audio id="sound-win" preload="auto"></audio>
 
 <script>
-  const symbols = ["💎", "🍀", "🎉", "🪙", "🎁", "🦄"];
+  // Configuration loaded from an external JSON file (or embedded)
+  const config = {
+    "gameConfig": {
+      "symbols": ["💎", "🍀", "🎉", "🪙", "🎁", "🦄"],
+      "initialReelFillSymbol": "💎",
+      "winAfterMinSpins": 1,
+      "winAfterMaxSpins": 3,
+      "spinAnimationDurationBase": 3,
+      "reelSpinDelayMultiplier": 0.3,
+      "reelHeightPx": 80,
+      "reelSymbolsCountForOffset": 19,
+      "confettiEmoji": ["🎉", "🎊", "💥"],
+      "confettiCount": 80,
+      "confettiExplosionDurationMs": 1000,
+      "confettiSpreadPx": 400
+    },
+    "audioConfig": {
+      "clickSound": "sounds/click.mp3",
+      "spinSound": "sounds/spin.mp3",
+      "winSound": "sounds/jackpot.mp3"
+    },
+    "textConfig": {
+      "spinButtonText": "🕹️ Mulai Spin",
+      "winMessagePrefix": "🎉 JACKPOT! Simbol: ",
+      "loseMessage": "💨 Coba lagi ya!",
+      "claimRewardButtonText": "🎁 CLAIM REWARD"
+    },
+    "redirectConfig": {
+      "winRedirectUrl": "https://www.google.com"
+    }
+  };
+
+  const { gameConfig, audioConfig, textConfig, redirectConfig } = config;
+
   let spinCount = 0;
-  let winAfter = Math.floor(Math.random() * 3) + 1;
+  let winAfter = Math.floor(Math.random() * (gameConfig.winAfterMaxSpins - gameConfig.winAfterMinSpins + 1)) + gameConfig.winAfterMinSpins;
   let hasWon = false;
 
   const soundClick = document.getElementById('sound-click');
@@ -122,13 +166,22 @@
   const button = document.getElementById("actionButton");
   const result = document.getElementById("result");
 
+  // Set audio sources from config
+  soundClick.src = audioConfig.clickSound;
+  soundSpin.src = audioConfig.spinSound;
+  soundWin.src = audioConfig.winSound;
+
+  // Set initial button text
+  button.textContent = textConfig.spinButtonText;
+  button.onclick = startSpin; // Attach the event listener
+
   function buildReel(finalSymbol, forceWin) {
     const reelSymbols = [];
-    for (let i = 0; i < 19; i++) {
-      const sym = symbols[Math.floor(Math.random() * symbols.length)];
+    for (let i = 0; i < gameConfig.reelSymbolsCountForOffset; i++) { // Adjusted loop count
+      const sym = gameConfig.symbols[Math.floor(Math.random() * gameConfig.symbols.length)];
       reelSymbols.push(sym);
     }
-    reelSymbols.push(forceWin ? finalSymbol : symbols[Math.floor(Math.random() * symbols.length)]);
+    reelSymbols.push(forceWin ? finalSymbol : gameConfig.symbols[Math.floor(Math.random() * gameConfig.symbols.length)]);
     return reelSymbols;
   }
 
@@ -150,7 +203,7 @@
     soundClick.play();
 
     if (hasWon) {
-      window.location.href = "https://www.google.com";
+      window.location.href = redirectConfig.winRedirectUrl;
       return;
     }
 
@@ -159,7 +212,7 @@
     result.textContent = "";
 
     const forceWin = spinCount === winAfter;
-    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+    const finalSymbol = gameConfig.symbols[Math.floor(Math.random() * gameConfig.symbols.length)];
 
     renderReel("reel1", buildReel(finalSymbol, forceWin));
     renderReel("reel2", buildReel(finalSymbol, forceWin));
@@ -169,10 +222,10 @@
     soundSpin.play().catch(console.warn);
 
     setTimeout(() => {
-      const offset = 80 * 19;
+      const offset = gameConfig.reelHeightPx * gameConfig.reelSymbolsCountForOffset;
       ["reel1", "reel2", "reel3"].forEach((id, i) => {
         const el = document.getElementById(id);
-        el.style.transition = `transform ${3 + i * 0.3}s`;
+        el.style.transition = `transform ${gameConfig.spinAnimationDurationBase + i * gameConfig.reelSpinDelayMultiplier}s`;
         el.style.transform = `translateY(-${offset}px)`;
       });
     }, 50);
@@ -182,38 +235,36 @@
       if (forceWin) {
         soundWin.currentTime = 0;
         soundWin.play();
-        result.textContent = `🎉 JACKPOT! Simbol: ${finalSymbol}`;
-        button.textContent = "🎁 CLAIM REWARD";
+        result.textContent = `${textConfig.winMessagePrefix}${finalSymbol}`;
+        button.textContent = textConfig.claimRewardButtonText;
         hasWon = true;
         launchConfetti();
       } else {
-        result.textContent = "💨 Coba lagi ya!";
+        result.textContent = textConfig.loseMessage;
       }
       button.disabled = false;
-    }, 3700);
+    }, (gameConfig.spinAnimationDurationBase + 2 * gameConfig.reelSpinDelayMultiplier) * 1000 + 100); // Wait for the longest reel + small buffer
   }
 
   function launchConfetti() {
-    const emojis = ["🎉", "🎊", "💥"];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < gameConfig.confettiCount; i++) {
       const confetti = document.createElement("div");
       confetti.className = "confetti";
-      confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      confetti.textContent = gameConfig.confettiEmoji[Math.floor(Math.random() * gameConfig.confettiEmoji.length)];
       confetti.style.left = "50vw";
       confetti.style.top = "50vh";
-      confetti.style.setProperty('--x', `${(Math.random() - 0.5) * 400}px`);
-      confetti.style.setProperty('--y', `${(Math.random() - 0.5) * 400}px`);
+      confetti.style.setProperty('--x', `${(Math.random() - 0.5) * gameConfig.confettiSpreadPx}px`);
+      confetti.style.setProperty('--y', `${(Math.random() - 0.5) * gameConfig.confettiSpreadPx}px`);
       document.body.appendChild(confetti);
-      setTimeout(() => confetti.remove(), 1000);
+      setTimeout(() => confetti.remove(), gameConfig.confettiExplosionDurationMs);
     }
   }
 
   // Initial reel display
   window.addEventListener("DOMContentLoaded", () => {
-    const defaultSymbol = "💎";
-    renderReel("reel1", Array(20).fill(defaultSymbol));
-    renderReel("reel2", Array(20).fill(defaultSymbol));
-    renderReel("reel3", Array(20).fill(defaultSymbol));
+    renderReel("reel1", Array(gameConfig.reelSymbolsCountForOffset + 1).fill(gameConfig.initialReelFillSymbol));
+    renderReel("reel2", Array(gameConfig.reelSymbolsCountForOffset + 1).fill(gameConfig.initialReelFillSymbol));
+    renderReel("reel3", Array(gameConfig.reelSymbolsCountForOffset + 1).fill(gameConfig.initialReelFillSymbol));
   });
 </script>
 
